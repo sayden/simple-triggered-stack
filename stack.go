@@ -1,9 +1,7 @@
 package simple_triggered_stack
 
 //Stackable must be satisfied for any interface that wants to be stacked using this library
-type Stackable interface {
-	Data() interface{}
-}
+type Stackable interface {}
 
 type stack struct {
 	ingestion chan Stackable

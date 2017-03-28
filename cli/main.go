@@ -19,7 +19,6 @@ func main() {
 	app := unpuzzled.NewApp()
 
 	app.Name = "Server"
-	app.Description = "Server"
 	app.Usage = "See --help for info"
 	app.Authors = []unpuzzled.Author{{Name: "Mario Castro", Email: "mariocaster@gmail.com"}}
 
@@ -39,12 +38,9 @@ func main() {
 	app.Run(os.Args)
 }
 
-type enqueuableString struct {
+type stackableString struct {
+	simple_triggered_stack.Stackable
 	data string
-}
-
-func (e *enqueuableString) Data() interface{} {
-	return e.data
 }
 
 func launch() {
@@ -60,21 +56,23 @@ func launch() {
 
 	stackCallback := func(stack []simple_triggered_stack.Stackable) {
 		for _, v := range stack {
-			fmt.Printf("%s ", v.Data())
+			if s, ok := v.(*stackableString); ok {
+				fmt.Printf("%s ", s.data	)
+			}
 		}
 
 		fmt.Println()
 	}
 
-	q := simple_triggered_stack.NewStack(quit, stackConfig, stackCallback)
+	stack := simple_triggered_stack.NewStack(quit, stackConfig, stackCallback)
 
 	for i := 0; i < msgN; i++ {
 		time.Sleep(time.Millisecond * 100)
-		q.IngestionCh() <- &enqueuableString{fmt.Sprintf("Hello %d", i)}
+		stack.IngestionCh() <- &stackableString{data: fmt.Sprintf("Hello %d", i)}
 	}
 
 	//We have finished pushing, close ingestion channel. Queue will notify of successful flushing by closing quit ch
-	close(q.IngestionCh())
+	close(stack.IngestionCh())
 
 	<-quit
 }
