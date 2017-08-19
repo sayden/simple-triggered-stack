@@ -2,48 +2,17 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/sayden/simple-triggered-stack"
-	"github.com/timjchin/unpuzzled"
 )
-
-type config struct {
-	port string
-}
-
-var conf config
-
-func main() {
-	app := unpuzzled.NewApp()
-
-	app.Name = "Server"
-	app.Usage = "See --help for info"
-	app.Authors = []unpuzzled.Author{{Name: "Mario Castro", Email: "mariocaster@gmail.com"}}
-
-	app.Command = &unpuzzled.Command{
-		Name:  "Main",
-		Usage: "Launches the server",
-		Variables: []unpuzzled.Variable{
-			&unpuzzled.StringVariable{
-				Name:        "port",
-				Destination: &conf.port,
-				Default:     "8080",
-				Description: "Server port",
-			},
-		},
-		Action: launch,
-	}
-	app.Run(os.Args)
-}
 
 type stackableString struct {
 	simple_triggered_stack.Stackable
 	data string
 }
 
-func launch() {
+func main() {
 	msgN := 10
 
 	//Channel that the stack will use to notify us that flushing has complete
@@ -57,7 +26,7 @@ func launch() {
 	stackCallback := func(stack []simple_triggered_stack.Stackable) {
 		for _, v := range stack {
 			if s, ok := v.(*stackableString); ok {
-				fmt.Printf("%s ", s.data	)
+				fmt.Printf("%s ", s.data)
 			}
 		}
 
